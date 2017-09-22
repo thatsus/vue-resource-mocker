@@ -2,7 +2,7 @@
   "name": "vue-resource-mocker",
   "version": "1.0.0",
   "description": "Provide mock responses from calls to vue-resource",
-  "main": "src/index.js",
+  "main": "src/vue-resource-mocker.js",
   "scripts": {
     "test": "karma start karma.conf.js"
   },
