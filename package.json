@@ -1,0 +1,23 @@
+{
+  "name": "vue-resource-mocker",
+  "version": "1.0.0",
+  "description": "Provide mock responses from calls to vue-resource",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "karma start karma.conf.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thatsus/vue-resource-mocker.git"
+  },
+  "contributors": {
+    "name": "Daniel Kuck-Alvarez",
+    "email": "dankuck@gmail.com",
+    "url": "http://dankuck.github.io/"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/thatsus/vue-resource-mocker/issues"
+  },
+  "homepage": "http://thatsus.com"
+}
