@@ -19,5 +19,20 @@
   "bugs": {
     "url": "https://github.com/thatsus/vue-resource-mocker/issues"
   },
-  "homepage": "http://thatsus.com"
+  "homepage": "http://thatsus.com",
+  "devDependencies": {
+    "karma": "^1.7.1",
+    "karma-mocha": "^1.3.0",
+    "karma-phantomjs-launcher": "^1.0.4",
+    "karma-webpack": "^2.0.4",
+    "laravel-elixir": "^6.0.0-16",
+    "laravel-elixir-webpack-official": "^1.0.10",
+    "mocha": "^3.5.3",
+    "phantomjs-prebuilt": "^2.1.15"
+  },
+  "dependencies": {
+    "url": "^0.11.0",
+    "vue": "^2.4.4",
+    "vue-resource": "^1.3.4"
+  }
 }
