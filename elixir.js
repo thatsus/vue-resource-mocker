@@ -4,24 +4,8 @@ var elixir = require('laravel-elixir');
 elixir.ready(function () {
   elixir.webpack.mergeConfig({
     devtool: 'source-map',
-    // ensure we are using the version of Vue that supports templates
-    resolve: {
-      alias: {
-        vue: 'vue/dist/vue.common.js'
-      },
-      extensions: ['.js', '.vue']
-    },
-    vue: {
-      buble: {
-        objectAssign: 'Object.assign'
-      }
-    },
     module: {
       loaders: [
-        {
-          test: /\.vue$/,
-          loader: 'vue-loader'
-        },
         {
           test: /\.js$/,
           loader: 'buble-loader',

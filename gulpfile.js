@@ -8,6 +8,10 @@ elixir.ready(function () {
     output: {
       libraryTarget: 'commonjs',
     },
+    externals: {
+        'vue': 'vue',
+        'vue-resource': 'vue-resource'
+    }
   });
 });
 
