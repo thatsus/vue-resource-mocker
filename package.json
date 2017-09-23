@@ -2,7 +2,7 @@
   "name": "vue-resource-mocker",
   "version": "1.0.0",
   "description": "Provide mock responses from calls to vue-resource",
-  "main": "src/vue-resource-mocker.js",
+  "main": "dist/vue-resource-mocker.js",
   "scripts": {
     "test": "karma start karma.conf.js"
   },
@@ -21,6 +21,7 @@
   },
   "homepage": "http://thatsus.com",
   "devDependencies": {
+    "gulp": "^3.9.1",
     "karma": "^1.7.1",
     "karma-mocha": "^1.3.0",
     "karma-phantomjs-launcher": "^1.0.4",
