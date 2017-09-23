@@ -23,13 +23,13 @@ Import VueResourceMocker and instantiate a mocker for Vue.
 import Vue from 'vue';
 import VueResourceMocker from 'vue-resource-mocker';
 
-let mocker = new VueResourceMocker();
-Vue.use(mocker);
+Vue.httpMocker = new VueResourceMocker();
+Vue.use(Vue.httpMocker);
 ```
 
 For each test, set the routes that you need.
 ```js
-mocker.setRoutes({
+Vue.httpMocker.setRoutes({
     GET: {
         '/api/users/{id}': function (request) {
             var user = {
@@ -50,7 +50,7 @@ The object should have keys equal to the capitalized form of any verbs your test
 
 Example:
 ```js
-mocker.setRoutes({
+Vue.httpMocker.setRoutes({
     GET: ...,
     POST: ...,
     PATCH: ...
@@ -67,7 +67,7 @@ Whenever an HTTP request is made the request path is used to match against the U
 
 Each function receives the request and should return a response built by calling `request.respondsWith()`.
 
-```
+```js
 {
     GET: {
         '/api/users', function (request) {
@@ -86,7 +86,7 @@ Each function receives the request and should return a response built by calling
 }
 ```
 
-If the route path string contains curly-braced portions, then those portions are wildcard for matching.
+If the route path string contains curly-braced portions, then those portions are wildcard.
 
 TODO: This should also send the matching portions of the request path as parameters to the function.
 
@@ -100,7 +100,7 @@ In the array form, each element is an object with the keys `route` and `use`.
 
 Example:
 
-```
+```js
 {
     GET: [
         route: '/api/users', 
