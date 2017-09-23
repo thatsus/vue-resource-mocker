@@ -238,4 +238,7 @@ describe('VueResourceMocker', function () {
             .then(done, done);
     });
 
+    it('should 500 or something on thrown error');
+
+    it('should send URL portions as params to closure');
 });
