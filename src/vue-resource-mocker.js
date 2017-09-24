@@ -18,7 +18,13 @@ class VueResourceMocker {
             if (!route) {
                 next(request.respondWith('File Not Found', {status: 404}));
             } else {
-                next(route(request));
+                let response;
+                try {
+                    response = route(request);
+                } catch (e) {
+                    response = request.respondWith(e, {status: 500});
+                }
+                next(response);
             }
         });
     }

@@ -238,7 +238,25 @@ describe('VueResourceMocker', function () {
             .then(done, done);
     });
 
-    it('should 500 or something on thrown error');
+    it.only('should 500 or something on thrown error', function (done) {
+        let mocker = new VueResourceMocker();
+        Vue.use(mocker);
+        mocker.setRoutes({
+            GET: {
+                '/endpoint/{id}/go': function (request) {
+                    throw "Oh no";
+                },
+            },
+        });
+
+        Vue.http.get('/endpoint/1/go?super-duper=1')
+            .catch(response => {
+                assert(response, 'Response is false: ' + response);
+                assert.equal(500, response.status, 'Status is wrong: ' + response.status);
+                assert.equal("Oh no", response.data);
+            })
+            .then(done, done);
+    });
 
     it('should send URL portions as params to closure');
 });

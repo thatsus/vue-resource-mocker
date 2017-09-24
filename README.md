@@ -134,9 +134,9 @@ If more than one route matches, the first one is used.
 
 If the response has a 4**, 5**, or 0 status, the Promise returned by Vue.http will be rejected, causing the next catch closure to run.
 
-If no route matches, a 404 File Not Found is returned.
+If no route matches, a 404 File Not Found response is passed along.
 
-TODO: If a closure throws an error, that should be returned as an error state.
+If a closure throws an error, a 500 response is passed along.
 
 # Troubleshooting
 
