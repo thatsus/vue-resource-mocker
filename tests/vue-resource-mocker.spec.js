@@ -293,7 +293,7 @@ describe('VueResourceMocker', function () {
 
     it('should getParams', function () {
         let mocker = new VueResourceMocker();
-        var params = mocker.getParams('/endpoint/{id}/{action}/sub/{sub}', '/endpoint/1337/defrag/sub/tree');
+        let params = mocker.getParams('/endpoint/{id}/{action}/sub/{sub}', '/endpoint/1337/defrag/sub/tree');
         assert(params, 'params is not even a thing');
         assert.equal('1337', params[0]);
         assert.equal('defrag', params[1]);
@@ -324,5 +324,43 @@ describe('VueResourceMocker', function () {
                 assert.equal('times', capturedValues[2]);
             })
             .then(done, done);
+    });
+
+    /**
+     * This is to test that the response is truly asyncronous by testing that
+     * the lines following the request run before the request.
+     * As it happens, vue-resource is already doing this.
+     * This test remains because if anything ever changes, we'll need to make
+     * adjustments
+     */
+    it('should take time', function (done) {
+        let ranThen = false;
+        let mocker = new VueResourceMocker();
+        Vue.use(mocker);
+        mocker.setRoutes({
+            GET: {
+                '/endpoint': function (request) {
+                    return request.respondWith('ok', {status: 200});
+                },
+            },
+        });
+
+        Vue.http.get('/endpoint')
+            .then(response => {
+                ranThen = true;
+            }, done);
+
+        // To realistically simulate a backend request and response,
+        // the response should come back asyncronously.
+        // If the response comes back before we get to this line,
+        // it was not asyncronous.
+        assert.equal(false, ranThen, 'ran too early');
+
+        let watch = setInterval(function () {
+            if (ranThen) {
+                clearInterval(watch);
+                done();
+            }
+        }, 100);
     });
 });
