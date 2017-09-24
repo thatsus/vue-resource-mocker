@@ -360,7 +360,7 @@ describe('VueResourceMocker', function () {
         // before the `then` closure above was run. That's the intended
         // behavior.
         onThen = function () {
-            done();
+            // no problem
         };
     });
 });
