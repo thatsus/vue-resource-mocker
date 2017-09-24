@@ -1656,32 +1656,59 @@ VueResourceMocker.prototype.install = function install (Vue) {
         if (!route) {
             next(request.respondWith('File Not Found', {status: 404}));
         } else {
-            next(route(request));
+            var response;
+            var pathname = __WEBPACK_IMPORTED_MODULE_0_url___default.a.parse(request.getUrl(), true, true).pathname;
+            var params = this$1.getParams(route.route, pathname);
+            params.unshift(request);
+            var closure = route.use
+            try {
+                response = closure.apply(null, params);
+            } catch (e) {
+                response = request.respondWith(e, {status: 500});
+            }
+            next(response);
         }
     });
 };
 
 VueResourceMocker.prototype.setRoutes = function setRoutes (routes) {
-    this.routes = routes;
+    this.routes = this.convertRoutes(routes);
+};
+
+VueResourceMocker.prototype.convertRoutes = function convertRoutes (routes) {
+        var this$1 = this;
+
+    var converted = {};
+    for (var method in routes) {
+        if (!(routes[method] instanceof Array)) {
+            converted[method] = this$1.convertRouteSet(routes[method]);
+        } else {
+            converted[method] = routes[method];
+        }
+    }
+    return converted;
+};
+
+VueResourceMocker.prototype.convertRouteSet = function convertRouteSet (object) {
+    var array = [];
+    for (var route in object) {
+        array.push({
+            route: route,
+            use: object[route],
+        });
+    }
+    return array;
 };
 
 VueResourceMocker.prototype.findRoute = function findRoute (request) {
+        var this$1 = this;
+
     var byMethod = this.routes[request.method];
     if (!byMethod) {
         return null;
     }
     var pathname = __WEBPACK_IMPORTED_MODULE_0_url___default.a.parse(request.getUrl(), true, true).pathname;
-    if (byMethod instanceof Array) {
-        return this.findRouteInArray(pathname, byMethod);
-    } else {
-        return this.findRouteInObject(pathname, byMethod);
-    }
-};
-
-VueResourceMocker.prototype.findRouteInArray = function findRouteInArray (pathname, array) {
-        var this$1 = this;
-
-    var match = array.filter(function (route) {
+    var match = byMethod.filter(function (route) {
         if (route.route && route.route.test && route.route.test(pathname)) {
             return true;
         } else if (route.route && this$1.stringToRegex(route.route).test(pathname)) {
@@ -1689,23 +1716,19 @@ VueResourceMocker.prototype.findRouteInArray = function findRouteInArray (pathna
         }
         return false;
     })[0];
-    if (match) {
-        return match.use;
-    }
-    return null;
-};
-
-VueResourceMocker.prototype.findRouteInObject = function findRouteInObject (pathname, object) {
-        var this$1 = this;
-
-    var matchKey = Object.keys(object).filter(function (route) {
-        return this$1.stringToRegex(route).test(pathname);
-    })[0];
-    return object[matchKey] || null;
+    return match || null;
 };
 
 VueResourceMocker.prototype.stringToRegex = function stringToRegex (str) {
-    return new RegExp('^' + str.replace(/{[^}]*}/, '.+') + '$');
+    return new RegExp('^' + str.replace(/{[^}]*}/g, '(.+)') + '$');
+};
+
+VueResourceMocker.prototype.getParams = function getParams (route, path) {
+    if (!route.test) {
+        route = this.stringToRegex(route);
+    }
+    var matches = path.match(route);
+    return matches.slice(1);
 };;
 
 module.exports = VueResourceMocker;
