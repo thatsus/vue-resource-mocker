@@ -334,7 +334,6 @@ describe('VueResourceMocker', function () {
      * adjustments
      */
     it('should take time', function (done) {
-        let ranThen = false;
         let mocker = new VueResourceMocker();
         Vue.use(mocker);
         mocker.setRoutes({
@@ -345,22 +344,23 @@ describe('VueResourceMocker', function () {
             },
         });
 
+        // If this version of onThen runs, then the `then` closure
+        // ran before the lines after the request. That's an error.
+        let onThen = function () {
+            assert(false, 'ran too early');
+        };
+
         Vue.http.get('/endpoint')
             .then(response => {
-                ranThen = true;
-            }, done);
+                onThen();
+            })
+            .then(done, done);
 
-        // To realistically simulate a backend request and response,
-        // the response should come back asyncronously.
-        // If the response comes back before we get to this line,
-        // it was not asyncronous.
-        assert.equal(false, ranThen, 'ran too early');
-
-        let watch = setInterval(function () {
-            if (ranThen) {
-                clearInterval(watch);
-                done();
-            }
-        }, 100);
+        // If this version of onThen runs, then this line was reached
+        // before the `then` closure above was run. That's the intended
+        // behavior.
+        onThen = function () {
+            done();
+        };
     });
 });
