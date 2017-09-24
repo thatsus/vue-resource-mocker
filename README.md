@@ -146,7 +146,3 @@ If a closure throws an error, a 500 response is passed along.
 # Troubleshooting
 
 If the response does not have a status given, the status will be 0. This will be an error state.
-
-# TODO
-
-This library should probably process requests after a short timeout in order to mimick asyncronous connections to a real server.
