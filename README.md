@@ -88,7 +88,7 @@ Each function receives the request and should return a response built by calling
 
 If the route path string contains curly-braced portions, then those portions are wildcard.
 
-TODO: This should also send the matching portions of the request path as parameters to the function.
+The matching portions of the request path are sent as additional parameters to the function.
 
 If the request path includes a query string it is ignored.
 

@@ -24,16 +24,42 @@ describe('VueResourceMocker', function () {
     });
 
     it('should setRoutes', function () {
-        let routes = {};
+        let routes = {GET:[]};
         let mocker = new VueResourceMocker();
         mocker.setRoutes(routes);
-        assert.equal(routes, mocker.routes);
+        assert.equal(routes.GET, mocker.routes.GET);
     });
 
     it('should instantiate with no routes', function () {
         let mocker = new VueResourceMocker();
         assert(mocker.routes, 'Has no routes object');
         assert.equal(0, Object.keys(mocker.routes).length);
+    });
+
+    it('should convertRoutes to array-style', function () {
+        let mocker = new VueResourceMocker();
+        let findMe = function(){};
+        let routes = mocker.convertRoutes({
+            GET: {
+                'x': findMe,
+            },
+        });
+        assert(routes.GET instanceof Array, 'not an array: ' + routes.GET);
+        assert(routes.GET[0] instanceof Object, 'not an object');
+        assert.equal('x', routes.GET[0].route);
+        assert.equal(findMe, routes.GET[0].use);
+    });
+
+    it('should convertRoutes on setRoutes', function () {
+        let mocker = new VueResourceMocker();
+        let findMe = function(){};
+        mocker.setRoutes({
+            GET: {
+                'x': findMe,
+            },
+        });
+        assert(mocker.routes.GET instanceof Array);
+        // the rest is presumably the same
     });
 
     it('should findRoute with exact match', function () {
@@ -50,7 +76,9 @@ describe('VueResourceMocker', function () {
             method: 'GET',
             getUrl() { return '/endpoint'; }
         });
-        assert.equal(findMe, route);
+        assert.equal('/endpoint', route.route);
+        assert(route instanceof Object);
+        assert.equal(findMe, route.use);
     });
 
     it('should not findRoute if method does not exist', function () {
@@ -96,7 +124,8 @@ describe('VueResourceMocker', function () {
             method: 'GET',
             getUrl() { return '/endpoint'; }
         });
-        assert.equal(findMe, route);
+        assert(route instanceof Object)
+        assert.equal(findMe, route.use);
     });
 
     it('should not findRoute with regex match', function () {
@@ -130,7 +159,8 @@ describe('VueResourceMocker', function () {
             method: 'GET',
             getUrl() { return '/endpoint'; }
         });
-        assert.equal(findMe, route);
+        assert(route instanceof Object);
+        assert.equal(findMe, route.use);
     });
 
     it('should stringToRegex', function () {
@@ -162,7 +192,8 @@ describe('VueResourceMocker', function () {
             method: 'GET',
             getUrl() { return '/endpoint/1/go'; }
         });
-        assert.equal(findMe, route);
+        assert(route instanceof Object);
+        assert.equal(findMe, route.use);
     });
 
     it('should findRoute with Laravel-style string match (object)', function () {
@@ -179,7 +210,8 @@ describe('VueResourceMocker', function () {
             method: 'GET',
             getUrl() { return '/endpoint/1/go'; }
         });
-        assert.equal(findMe, route);
+        assert(route instanceof Object);
+        assert.equal(findMe, route.use);
     });
 
     it('should findRoute and ignore query params', function () {
@@ -196,7 +228,8 @@ describe('VueResourceMocker', function () {
             method: 'GET',
             getUrl() { return '/endpoint/1/go?x=1'; }
         });
-        assert.equal(findMe, route);
+        assert(route instanceof Object);
+        assert.equal(findMe, route.use);
     });
 
     it('should execute route', function (done) {
@@ -238,7 +271,7 @@ describe('VueResourceMocker', function () {
             .then(done, done);
     });
 
-    it.only('should 500 or something on thrown error', function (done) {
+    it('should 500 or something on thrown error', function (done) {
         let mocker = new VueResourceMocker();
         Vue.use(mocker);
         mocker.setRoutes({
@@ -258,5 +291,38 @@ describe('VueResourceMocker', function () {
             .then(done, done);
     });
 
-    it('should send URL portions as params to closure');
+    it('should getParams', function () {
+        let mocker = new VueResourceMocker();
+        var params = mocker.getParams('/endpoint/{id}/{action}/sub/{sub}', '/endpoint/1337/defrag/sub/tree');
+        assert(params, 'params is not even a thing');
+        assert.equal('1337', params[0]);
+        assert.equal('defrag', params[1]);
+        assert.equal('tree', params[2]);
+    });
+
+    it('should send URL portions as params to closure', function (done) {
+        let mocker = new VueResourceMocker();
+        let capturedValues = null;
+        Vue.use(mocker);
+        mocker.setRoutes({
+            GET: {
+                '/it/{id1}/the/{id2}/of/{id3}': function (request, id1, id2, id3) {
+                    capturedValues = [id1, id2, id3];
+                    return request.respondWith(`${id1} ${id2} ${id3}`, {status: 200});
+                },
+            },
+        });
+
+        Vue.http.get('/it/was/the/best/of/times?super-duper=1')
+            .then(response => {
+                assert(response, 'Response is false: ' + response);
+                assert.equal('was best times', response.data, 'data is wrong: ' + response.data);
+                assert(capturedValues, 'No captured values');
+                assert.equal(3, capturedValues.length);
+                assert.equal('was', capturedValues[0]);
+                assert.equal('best', capturedValues[1]);
+                assert.equal('times', capturedValues[2]);
+            })
+            .then(done, done);
+    });
 });

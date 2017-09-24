@@ -19,8 +19,12 @@ class VueResourceMocker {
                 next(request.respondWith('File Not Found', {status: 404}));
             } else {
                 let response;
+                let pathname = url.parse(request.getUrl(), true, true).pathname;
+                let params = this.getParams(route.route, pathname);
+                params.unshift(request);
+                let closure = route.use
                 try {
-                    response = route(request);
+                    response = closure.apply(null, params);
                 } catch (e) {
                     response = request.respondWith(e, {status: 500});
                 }
@@ -30,7 +34,30 @@ class VueResourceMocker {
     }
 
     setRoutes(routes) {
-        this.routes = routes;
+        this.routes = this.convertRoutes(routes);
+    }
+
+    convertRoutes(routes) {
+        let converted = {};
+        for (let method in routes) {
+            if (!(routes[method] instanceof Array)) {
+                converted[method] = this.convertRouteSet(routes[method]);
+            } else {
+                converted[method] = routes[method];
+            }
+        }
+        return converted;
+    }
+
+    convertRouteSet(object) {
+        let array = [];
+        for (let route in object) {
+            array.push({
+                route: route,
+                use: object[route],
+            });
+        }
+        return array;
     }
 
     findRoute(request) {
@@ -39,15 +66,7 @@ class VueResourceMocker {
             return null;
         }
         let pathname = url.parse(request.getUrl(), true, true).pathname;
-        if (byMethod instanceof Array) {
-            return this.findRouteInArray(pathname, byMethod);
-        } else {
-            return this.findRouteInObject(pathname, byMethod);
-        }
-    }
-
-    findRouteInArray(pathname, array) {
-        let match = array.filter((route) => {
+        let match = byMethod.filter((route) => {
             if (route.route && route.route.test && route.route.test(pathname)) {
                 return true;
             } else if (route.route && this.stringToRegex(route.route).test(pathname)) {
@@ -55,21 +74,19 @@ class VueResourceMocker {
             }
             return false;
         })[0];
-        if (match) {
-            return match.use;
-        }
-        return null;
-    }
-
-    findRouteInObject(pathname, object) {
-        let matchKey = Object.keys(object).filter((route) => {
-            return this.stringToRegex(route).test(pathname);
-        })[0];
-        return object[matchKey] || null;
+        return match || null;
     }
 
     stringToRegex(str) {
-        return new RegExp('^' + str.replace(/{[^}]*}/, '.+') + '$');
+        return new RegExp('^' + str.replace(/{[^}]*}/g, '(.+)') + '$');
+    }
+
+    getParams(route, path) {
+        if (!route.test) {
+            route = this.stringToRegex(route);
+        }
+        var matches = path.match(route);
+        return matches.slice(1);
     }
 };
 
