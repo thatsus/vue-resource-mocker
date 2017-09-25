@@ -1,9 +1,6 @@
 
 import url from 'url';
 import Vue from 'vue';
-import VueResource from 'vue-resource';
-
-Vue.use(VueResource);
 
 /**
  * Vue plugin that intercepts vue-resource calls so that custom responses can 
@@ -20,6 +17,9 @@ class VueResourceMocker {
      * Vue calls this when Vue.use() is called.
      */
     install(Vue) {
+        if (!Vue.http) {
+            throw "Please install the vue-resource plugin before installing the vue-resource-mocker plugin.";
+        }
         Vue.http.interceptors.length = 0;
         Vue.http.interceptors.push((request, next) => {
             let route = this.findRoute(request);

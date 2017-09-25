@@ -2,6 +2,9 @@
 import VueResourceMocker from '../src/vue-resource-mocker';
 import assert from 'assert';
 import Vue from 'vue';
+import VueResource from 'vue-resource';
+
+Vue.use(VueResource);
 
 describe('VueResourceMocker', function () {
 
@@ -21,6 +24,19 @@ describe('VueResourceMocker', function () {
         };
         new VueResourceMocker().install(fakeVue);
         assert.equal(1, fakeVue.http.interceptors.length);
+    });
+
+    it('should not install without vue-resource in place', function () {
+        let fakeVue = {
+            // no http here
+        };
+        let caught;
+        try {
+            new VueResourceMocker().install(fakeVue);
+        } catch (e) {
+            caught = e;
+        }
+        assert(caught, "No exception was thrown");
     });
 
     it('should setRoutes', function () {
