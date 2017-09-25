@@ -326,6 +326,25 @@ describe('VueResourceMocker', function () {
             .then(done, done);
     });
 
+    it('should decode URL params', function (done) {
+        let mocker = new VueResourceMocker();
+        Vue.use(mocker);
+        mocker.setRoutes({
+            GET: {
+                '/endpoint/{keyword}': function (request, keyword) {
+                    return request.respondWith(`${keyword}`, {status: 200});
+                },
+            },
+        });
+
+        Vue.http.get('/endpoint/hat%20trick')
+            .then(response => {
+                assert(response, 'Response is false: ' + response);
+                assert.equal('hat trick', response.data, 'data is wrong: ' + response.data);
+            })
+            .then(done, done);
+    });
+
     /**
      * This is to test that the response is truly asyncronous by testing that
      * the lines following the request run before the request.

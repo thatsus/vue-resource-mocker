@@ -92,7 +92,7 @@ Each function receives the request and should return a response built by calling
 
 If the route path string contains curly-braced portions then those portions are wildcards.
 
-The matching portions of the request path are sent as additional parameters to the function.
+The matching portions of the request path are sent as additional parameters to the function after being decoded from URL form.
 
 If the request path includes a query string it is ignored while matching.
 
@@ -132,7 +132,7 @@ Whenever an HTTP request is made the request path is used to match against the r
 
 The `use` function receives the request and should return a response built by calling `request.respondWith()`.
 
-If `route` is a RegExp with parenthesized parts or a string with curly-braced wildcards, the matching portions of the request path are sent as additional parameters to the function.
+If `route` is a RegExp with parenthesized parts or a string with curly-braced wildcards, the matching portions of the request path are sent as additional parameters to the function after being decoded from URL form.
 
 If the request path includes a query string it is ignored while matching.
 

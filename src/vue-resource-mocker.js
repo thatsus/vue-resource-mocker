@@ -20,7 +20,8 @@ class VueResourceMocker {
             } else {
                 let response;
                 let pathname = url.parse(request.getUrl(), true, true).pathname;
-                let params = this.getParams(route.route, pathname);
+                let params = this.getParams(route.route, pathname)
+                    .map(decodeURIComponent);
                 params.unshift(request);
                 let closure = route.use
                 try {
