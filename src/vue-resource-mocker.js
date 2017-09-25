@@ -5,12 +5,20 @@ import VueResource from 'vue-resource';
 
 Vue.use(VueResource);
 
+/**
+ * Vue plugin that intercepts vue-resource calls so that custom responses can 
+ * be used in testing.
+ */
+
 class VueResourceMocker {
 
     constructor() {
         this.routes = {};
     }
 
+    /**
+     * Vue calls this when Vue.use() is called.
+     */
     install(Vue) {
         Vue.http.interceptors.length = 0;
         Vue.http.interceptors.push((request, next) => {
@@ -34,10 +42,19 @@ class VueResourceMocker {
         });
     }
 
+    /**
+     * Change the routes being mocked
+     * @param {Object} routes
+     */
     setRoutes(routes) {
         this.routes = this.convertRoutes(routes);
     }
 
+    /**
+     * Put all the routes in array format.
+     * @param  {Object} routes
+     * @return {Object}
+     */
     convertRoutes(routes) {
         let converted = {};
         for (let method in routes) {
@@ -50,6 +67,11 @@ class VueResourceMocker {
         return converted;
     }
 
+    /**
+     * Supports convertRoutes
+     * @param  {Object} object
+     * @return {Array}
+     */
     convertRouteSet(object) {
         let array = [];
         for (let route in object) {
@@ -61,6 +83,11 @@ class VueResourceMocker {
         return array;
     }
 
+    /**
+     * Given a vue-resource request object, returns a route array or null.
+     * @param  {Object} request
+     * @return {Array|null}
+     */
     findRoute(request) {
         let byMethod = this.routes[request.method];
         if (!byMethod) {
@@ -78,10 +105,23 @@ class VueResourceMocker {
         return match || null;
     }
 
+    /**
+     * Given a string in the curly-brace wildcard format, returns a RegExp 
+     * that matches strings like that.
+     * @param  {string} str
+     * @return {RegExp}
+     */
     stringToRegex(str) {
         return new RegExp('^' + str.replace(/{[^}]*}/g, '(.+)') + '$');
     }
 
+    /**
+     * Given a route array and a request path, finds any wildcard matched 
+     * parts.
+     * @param  {Array} route
+     * @param  {string} path
+     * @return {Array}
+     */
     getParams(route, path) {
         if (!route.test) {
             route = this.stringToRegex(route);
