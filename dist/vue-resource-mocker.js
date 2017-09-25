@@ -62,7 +62,7 @@ module.exports =
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 10);
+/******/ 	return __webpack_require__(__webpack_require__.s = 9);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -93,8 +93,8 @@ module.exports =
 
 'use strict';
 
-var punycode = __webpack_require__(3);
-var util = __webpack_require__(7);
+var punycode = __webpack_require__(2);
+var util = __webpack_require__(6);
 
 exports.parse = urlParse;
 exports.resolve = urlResolve;
@@ -169,7 +169,7 @@ var protocolPattern = /^([a-z0-9.+-]+:)/i,
       'gopher:': true,
       'file:': true
     },
-    querystring = __webpack_require__(6);
+    querystring = __webpack_require__(5);
 
 function urlParse(url, parseQueryString, slashesDenoteHost) {
   if (url && util.isObject(url) && url instanceof Url) return url;
@@ -816,12 +816,6 @@ module.exports = require("vue");
 
 /***/ },
 /* 2 */
-/***/ function(module, exports) {
-
-module.exports = require("vue-resource");
-
-/***/ },
-/* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module, global) {var __WEBPACK_AMD_DEFINE_RESULT__;/*! https://mths.be/punycode v1.4.1 by @mathias */
@@ -1356,10 +1350,10 @@ module.exports = require("vue-resource");
 
 }(this));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(9)(module), __webpack_require__(8)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(8)(module), __webpack_require__(7)))
 
 /***/ },
-/* 4 */
+/* 3 */
 /***/ function(module, exports) {
 
 "use strict";
@@ -1450,7 +1444,7 @@ var isArray = Array.isArray || function (xs) {
 
 
 /***/ },
-/* 5 */
+/* 4 */
 /***/ function(module, exports) {
 
 "use strict";
@@ -1542,18 +1536,18 @@ var objectKeys = Object.keys || function (obj) {
 
 
 /***/ },
-/* 6 */
+/* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
 "use strict";
 'use strict';
 
-exports.decode = exports.parse = __webpack_require__(4);
-exports.encode = exports.stringify = __webpack_require__(5);
+exports.decode = exports.parse = __webpack_require__(3);
+exports.encode = exports.stringify = __webpack_require__(4);
 
 
 /***/ },
-/* 7 */
+/* 6 */
 /***/ function(module, exports) {
 
 "use strict";
@@ -1576,7 +1570,7 @@ module.exports = {
 
 
 /***/ },
-/* 8 */
+/* 7 */
 /***/ function(module, exports) {
 
 var g;
@@ -1601,7 +1595,7 @@ module.exports = g;
 
 
 /***/ },
-/* 9 */
+/* 8 */
 /***/ function(module, exports) {
 
 module.exports = function(module) {
@@ -1627,7 +1621,7 @@ module.exports = function(module) {
 
 
 /***/ },
-/* 10 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1635,22 +1629,28 @@ module.exports = function(module) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_url___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_url__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_vue__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_vue__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_vue_resource__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_vue_resource___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_vue_resource__);
 
 
 
 
-
-__WEBPACK_IMPORTED_MODULE_1_vue___default.a.use(__WEBPACK_IMPORTED_MODULE_2_vue_resource___default.a);
+/**
+ * Vue plugin that intercepts vue-resource calls so that custom responses can 
+ * be used in testing.
+ */
 
 var VueResourceMocker = function VueResourceMocker() {
     this.routes = {};
 };
 
+/**
+ * Vue calls this when Vue.use() is called.
+ */
 VueResourceMocker.prototype.install = function install (Vue) {
         var this$1 = this;
 
+    if (!Vue.http) {
+        throw "Please install the vue-resource plugin before installing the vue-resource-mocker plugin.";
+    }
     Vue.http.interceptors.length = 0;
     Vue.http.interceptors.push(function (request, next) {
         var route = this$1.findRoute(request);
@@ -1673,10 +1673,19 @@ VueResourceMocker.prototype.install = function install (Vue) {
     });
 };
 
+/**
+ * Change the routes being mocked
+ * @param {Object} routes
+ */
 VueResourceMocker.prototype.setRoutes = function setRoutes (routes) {
     this.routes = this.convertRoutes(routes);
 };
 
+/**
+ * Put all the routes in array format.
+ * @param  {Object} routes
+ * @return {Object}
+ */
 VueResourceMocker.prototype.convertRoutes = function convertRoutes (routes) {
         var this$1 = this;
 
@@ -1691,6 +1700,11 @@ VueResourceMocker.prototype.convertRoutes = function convertRoutes (routes) {
     return converted;
 };
 
+/**
+ * Supports convertRoutes
+ * @param  {Object} object
+ * @return {Array}
+ */
 VueResourceMocker.prototype.convertRouteSet = function convertRouteSet (object) {
     var array = [];
     for (var route in object) {
@@ -1702,6 +1716,11 @@ VueResourceMocker.prototype.convertRouteSet = function convertRouteSet (object) 
     return array;
 };
 
+/**
+ * Given a vue-resource request object, returns a route array or null.
+ * @param  {Object} request
+ * @return {Array|null}
+ */
 VueResourceMocker.prototype.findRoute = function findRoute (request) {
         var this$1 = this;
 
@@ -1721,10 +1740,23 @@ VueResourceMocker.prototype.findRoute = function findRoute (request) {
     return match || null;
 };
 
+/**
+ * Given a string in the curly-brace wildcard format, returns a RegExp 
+ * that matches strings like that.
+ * @param  {string} str
+ * @return {RegExp}
+ */
 VueResourceMocker.prototype.stringToRegex = function stringToRegex (str) {
     return new RegExp('^' + str.replace(/{[^}]*}/g, '(.+)') + '$');
 };
 
+/**
+ * Given a route array and a request path, finds any wildcard matched 
+ * parts.
+ * @param  {Array} route
+ * @param  {string} path
+ * @return {Array}
+ */
 VueResourceMocker.prototype.getParams = function getParams (route, path) {
     if (!route.test) {
         route = this.stringToRegex(route);
