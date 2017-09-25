@@ -1658,7 +1658,8 @@ VueResourceMocker.prototype.install = function install (Vue) {
         } else {
             var response;
             var pathname = __WEBPACK_IMPORTED_MODULE_0_url___default.a.parse(request.getUrl(), true, true).pathname;
-            var params = this$1.getParams(route.route, pathname);
+            var params = this$1.getParams(route.route, pathname)
+                .map(decodeURIComponent);
             params.unshift(request);
             var closure = route.use
             try {
