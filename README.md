@@ -6,7 +6,6 @@ Provide mock responses from calls to vue-resource.
 Add the beta path to your package.json
 ```json
 "devDependencies": {
-    ...
     "vue-resource-mocker": "thatsus/vue-resource-mocker#beta"
 }
 ```
@@ -70,13 +69,13 @@ In the object form the keys are URL paths and the values are functions.
 
 Whenever an HTTP request is made the request path is used to match against the URL paths in the routes.
 
-Each function receives the request and should return a response built by calling `request.respondsWith()`.
+Each function receives the request and should return a response built by calling `request.respondWith()`.
 
 ```js
 {
     GET: {
         '/api/users', function (request) {
-            return request.respondsWith([
+            return request.respondWith([
                 {
                     id: 1,
                     name: 'Huck Finn'
@@ -95,7 +94,7 @@ If the route path string contains curly-braced portions then those portions are 
 
 The matching portions of the request path are sent as additional parameters to the function.
 
-If the request path includes a query string it is ignored.
+If the request path includes a query string it is ignored while matching.
 
 If more than one route matches, the first one is used.
 
@@ -110,7 +109,7 @@ Example:
     GET: [
         route: '/api/users', 
         use: function (request) {
-            return request.respondsWith([
+            return request.respondWith([
                 {
                     id: 1,
                     name: 'Huck Finn'
@@ -131,9 +130,11 @@ Example:
 
 Whenever an HTTP request is made the request path is used to match against the routes.
 
-The `use` function receives the request and should return a response built by calling `request.respondsWith()`.
+The `use` function receives the request and should return a response built by calling `request.respondWith()`.
 
-If the route is a RegExp with parenthesized parts or a string with curly-braced wildcards, the matching portions of the request path are sent as additional parameters to the function.
+If `route` is a RegExp with parenthesized parts or a string with curly-braced wildcards, the matching portions of the request path are sent as additional parameters to the function.
+
+If the request path includes a query string it is ignored while matching.
 
 If more than one route matches, the first one is used.
 
