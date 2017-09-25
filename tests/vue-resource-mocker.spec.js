@@ -379,22 +379,22 @@ describe('VueResourceMocker', function () {
             },
         });
 
-        // If this version of onThen runs, then the `then` closure
-        // ran before the lines after the request. That's an error.
-        let onThen = function () {
+        // We expect the code flow below to be 1, 2, 3, 4.
+        // If it is 1, 2, 4, 3, then it means the `then` closure ran too soon.
+        // That's a problem, because in real situations, we expect the code
+        // after the `then` chain to run before the `then` ever gets called.
+        
+        let onThen = function () { // 1. assign onThen to a BAD closure
             assert(false, 'ran too early');
         };
 
-        Vue.http.get('/endpoint')
-            .then(response => {
+        Vue.http.get('/endpoint')  // 2. call /endpoint
+            .then(response => {    // 4. get response and call onThen
                 onThen();
             })
             .then(done, done);
-
-        // If this version of onThen runs, then this line was reached
-        // before the `then` closure above was run. That's the intended
-        // behavior.
-        onThen = function () {
+                              
+        onThen = function () {     // 3. reassign onThen to a do-nothing closure
             // no problem
         };
     });
