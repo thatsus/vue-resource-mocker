@@ -70,7 +70,7 @@ In the object form the keys are URL paths and the values are functions.
 
 Whenever an HTTP request is made the request path is used to match against the URL paths in the routes.
 
-Each function receives the request and may return data to respond to the request. Any value can be returned. For advanced options, return a Response object by calling `request.respondWith()`.
+Each function receives the request and may return data to respond to the request. Any value can be returned. For advanced options, return a Response object.
 
 ```js
 {
@@ -131,7 +131,7 @@ Example:
 
 Whenever an HTTP request is made the request path is used to match against the routes.
 
-The `use` function receives the request and may return data to respond to the request. Any value can be returned. For advanced options, return a Response object by calling `request.respondWith()`.
+The `use` function receives the request and may return data to respond to the request. Any value can be returned. For advanced options, return a Response object.
 
 If `route` is a RegExp with parenthesized parts or a string with curly-braced wildcards, the matching portions of the request path are sent as additional parameters to the function after being decoded from URL form.
 
@@ -143,7 +143,7 @@ If more than one route matches, the first one is used.
 
 The return value of a route closure can be any data type. The status will be 200 for regular responses.
 
-For advanced responses, use request.respondWith(body, options). The `body` can be any data type. The `options` is an object with some of the following keys:
+For advanced responses, use `request.respondWith(body, options)`. The `body` can be any data type. The `options` parameter is an object with some of the following keys:
 
  * status - number, required
  * statusText - string
