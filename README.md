@@ -1,5 +1,5 @@
 # vue-resource-mocker
-Provide mock responses from calls to vue-resource
+Provide mock responses from calls to vue-resource.
 
 # Installation
 
@@ -91,7 +91,7 @@ Each function receives the request and should return a response built by calling
 }
 ```
 
-If the route path string contains curly-braced portions, then those portions are wildcard.
+If the route path string contains curly-braced portions then those portions are wildcards.
 
 The matching portions of the request path are sent as additional parameters to the function.
 
@@ -133,15 +133,17 @@ Whenever an HTTP request is made the request path is used to match against the r
 
 The `use` function receives the request and should return a response built by calling `request.respondsWith()`.
 
+If the route is a RegExp with parenthesized parts or a string with curly-braced wildcards, the matching portions of the request path are sent as additional parameters to the function.
+
 If more than one route matches, the first one is used.
 
 # Errors
 
-If the response has a 4**, 5**, or 0 status, the Promise returned by Vue.http will be rejected, causing the next catch closure to run.
+If the response has a 4xx, 5xx, or 0 status, the Promise returned by Vue.http will be rejected, causing the next catch closure to run.
 
-If no route matches, a 404 File Not Found response is passed along.
+If no route matches, the Promise is rejected with a 404 File Not Found response.
 
-If a closure throws an error, a 500 response is passed along.
+If a closure throws an error, the Promise is rejected with a 500 response and the thrown value is in the `data` key.
 
 # Troubleshooting
 
