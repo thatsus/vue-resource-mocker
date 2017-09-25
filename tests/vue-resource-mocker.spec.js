@@ -398,4 +398,50 @@ describe('VueResourceMocker', function () {
             // no problem
         };
     });
+
+    it('should get the Response constructor', function (done) {
+        let mocker = new VueResourceMocker();
+        Vue.use(mocker);
+        let getARequest = Promise.resolve().then(() => {
+            let request;
+            mocker.setRoutes({
+                GET: {
+                    '/': function (r) {
+                        request = r;
+                    },
+                },
+            });
+
+            return Vue.http.get('/')
+                .then(() => {
+                    return request;
+                });
+        });
+        getARequest
+            .then((request) => {
+                let response = request.respondWith(null);
+                let Response = response.constructor;
+                assert.equal(Response, mocker.getResponseClass());
+            })
+            .then(done, done);
+    });
+
+    it('should convert non-response objects to responses', function (done) {
+        let mocker = new VueResourceMocker();
+        Vue.use(mocker);
+        mocker.setRoutes({
+            GET: {
+                '/endpoint': function (request) {
+                    return 'ok';
+                },
+            },
+        });
+
+        Vue.http.get('/endpoint')
+            .then((response) => {
+                assert(response.ok);
+                assert.equal('ok', response.data, 'response does not have ok as data');
+            })
+            .then(done, done);
+    });
 });
