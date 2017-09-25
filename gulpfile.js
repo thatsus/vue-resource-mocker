@@ -6,7 +6,7 @@ var elixir = require('./elixir.js');
 elixir.ready(function () {
   elixir.webpack.mergeConfig({
     output: {
-      libraryTarget: 'commonjs',
+      libraryTarget: 'commonjs2',
     },
     externals: {
         'vue': 'vue',
