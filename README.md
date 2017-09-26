@@ -151,3 +151,7 @@ If the response has a 4xx, 5xx, or 0 status, the Promise returned by Vue.http wi
 If no route matches, the Promise is rejected with a 404 File Not Found response.
 
 If a closure throws an error, the Promise is rejected with a 500 response and the thrown value is in the `data` key.
+
+# Changelog
+
+- v1.0.1 - Closures can now return simple data and it will be treated as 200.
