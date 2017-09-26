@@ -3,16 +3,8 @@ Provide mock responses from calls to vue-resource.
 
 # Installation
 
-Add the beta path to your package.json
-```json
-"devDependencies": {
-    "vue-resource-mocker": "thatsus/vue-resource-mocker#beta"
-}
-```
-
-Install
 ```bash
-npm install
+npm install vue-resource-mocker --save-dev
 ```
 
 # Usage
