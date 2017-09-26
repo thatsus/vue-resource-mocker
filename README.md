@@ -131,6 +131,26 @@ If the request path includes a query string it is ignored while matching.
 
 If more than one route matches, the first one is used.
 
+# Requests
+
+The first parameter to a route closure is a Request object with the following 
+members:
+
+ * url - string
+ * body - any
+ * headers - Headers
+ * method - string
+ * query - object
+ * getUrl() - a processed form of `url`
+ * getBody() - any
+ * respondWith(body, options) - Response
+
+The `query` field contains a parsed form of the URL's query string. This is a custom field provided by this library, not vue-resource.
+
+The `headers` object can have any keys. Its values are arrays.
+
+The rest of the parameters to a route closure are the matching portions of any wildcards in the request URL.
+
 # Responses
 
 The return value of a route closure can be any data type. The status will be 200 for regular responses.
