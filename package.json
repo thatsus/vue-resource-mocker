@@ -1,6 +1,6 @@
 {
   "name": "vue-resource-mocker",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Provide mock responses from calls to vue-resource",
   "main": "dist/vue-resource-mocker.js",
   "scripts": {

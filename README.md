@@ -154,4 +154,13 @@ If a closure throws an error, the Promise is rejected with a 500 response and th
 
 # Changelog
 
+- v1.0.2 - URL query strings are parsed and added to the request object.
 - v1.0.1 - Closures can now return simple data and it will be treated as 200.
+
+# Contribution
+
+If you find a bug or want to contribute to the code or documentation, you can help by submitting an [issue](https://github.com/thatsus/vue-resource-mocker/issues) or a [pull request](https://github.com/thatsus/vue-resource-mocker/pulls).
+
+# License
+
+[MIT](http://opensource.org/licenses/MIT)
