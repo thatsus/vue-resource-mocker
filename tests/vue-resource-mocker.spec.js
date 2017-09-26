@@ -444,4 +444,29 @@ describe('VueResourceMocker', function () {
             })
             .then(done, done);
     });
+
+    it('should add the query as an object to the request', function (done) {
+        let mocker = new VueResourceMocker();
+        Vue.use(mocker);
+        mocker.setRoutes({
+            GET: {
+                '/endpoint': function (request) {
+                    return request.query;
+                },
+            },
+        });
+
+        Vue.http.get('/endpoint?x=1&y[]=2&z[abc]=d%20e%20f')
+            .then((response) => {
+                assert(response.ok);
+                assert(response.data instanceof Object, 'response.data is not an Object');
+                assert.equal(1, response.data.x);
+                assert(response.data.y instanceof Array, 'y is not an array');
+                assert.equal(1, response.data.y.length, 'y is the wrong length: ' + response.data.y.length);
+                assert.equal(2, response.data.y[0]);
+                assert(response.data.z instanceof Object, 'z is not an Object');
+                assert.equal('d e f', response.data.z.abc, 'z.abc is not the correct value: ' + response.data.z.abc);
+            })
+            .then(done, done);
+    });
 });
