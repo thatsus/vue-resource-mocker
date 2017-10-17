@@ -9,9 +9,10 @@ npm install vue-resource-mocker --save-dev
 
 # Usage
 
-Import VueResourceMocker and instantiate a mocker for Vue.
+Import VueResourceMocker and VueResource, and instantiate a mocker for Vue.
 ```js
 import Vue from 'vue';
+import VueResource from 'vue-resource';
 import VueResourceMocker from 'vue-resource-mocker';
 
 Vue.httpMocker = new VueResourceMocker();
@@ -27,7 +28,7 @@ Vue.httpMocker.setRoutes({
                 id: 1,
                 name: 'Hiro Protagonist',
             };
-            return request.respondWith(user, {status: 200});
+            return user;
         }
     }
 });
@@ -61,13 +62,13 @@ In the object form the keys are URL paths and the values are functions.
 
 Whenever an HTTP request is made the request path is used to match against the URL paths in the routes.
 
-Each function receives the request and should return a response built by calling `request.respondWith()`.
+Each function receives the request and may return data to respond to the request. Any value can be returned. For advanced options, return a Response object.
 
 ```js
 {
     GET: {
         '/api/users', function (request) {
-            return request.respondWith([
+            return [
                 {
                     id: 1,
                     name: 'Huck Finn'
@@ -76,7 +77,7 @@ Each function receives the request and should return a response built by calling
                     id: 2,
                     name: 'Tom Sawyer'
                 }
-            ], {status: 200});
+            ]);
         }
     }
 }
@@ -101,7 +102,7 @@ Example:
     GET: [
         route: '/api/users', 
         use: function (request) {
-            return request.respondWith([
+            return [
                 {
                     id: 1,
                     name: 'Huck Finn'
@@ -110,7 +111,7 @@ Example:
                     id: 2,
                     name: 'Tom Sawyer'
                 }
-            ], {status: 200});
+            ];
         }
     ]
 }
@@ -122,13 +123,26 @@ Example:
 
 Whenever an HTTP request is made the request path is used to match against the routes.
 
-The `use` function receives the request and should return a response built by calling `request.respondWith()`.
+The `use` function receives the request and may return data to respond to the request. Any value can be returned. For advanced options, return a Response object.
 
 If `route` is a RegExp with parenthesized parts or a string with curly-braced wildcards, the matching portions of the request path are sent as additional parameters to the function after being decoded from URL form.
 
 If the request path includes a query string it is ignored while matching.
 
 If more than one route matches, the first one is used.
+
+# Responses
+
+The return value of a route closure can be any data type. The status will be 200 for regular responses.
+
+For advanced responses, use `request.respondWith(body, options)`. The `body` can be any data type. The `options` parameter is an object with some of the following keys:
+
+ * status - number, required
+ * statusText - string
+ * url - string
+ * headers - object
+
+The `headers` object can have any keys. Its values should be arrays.
 
 # Errors
 
@@ -138,6 +152,6 @@ If no route matches, the Promise is rejected with a 404 File Not Found response.
 
 If a closure throws an error, the Promise is rejected with a 500 response and the thrown value is in the `data` key.
 
-# Troubleshooting
+# Changelog
 
-If the response does not have a status given, the status will be 0. This will be an error state.
+- v1.0.1 - Closures can now return simple data and it will be treated as 200.

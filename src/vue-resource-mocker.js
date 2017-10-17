@@ -2,6 +2,8 @@
 import url from 'url';
 import Vue from 'vue';
 
+let Response = null;
+
 /**
  * Vue plugin that intercepts vue-resource calls so that custom responses can 
  * be used in testing.
@@ -22,6 +24,9 @@ class VueResourceMocker {
         }
         Vue.http.interceptors.length = 0;
         Vue.http.interceptors.push((request, next) => {
+            if (!Response) {
+                Response = request.respondWith(null).constructor;
+            }
             let route = this.findRoute(request);
             if (!route) {
                 next(request.respondWith('File Not Found', {status: 404}));
@@ -34,6 +39,9 @@ class VueResourceMocker {
                 let closure = route.use
                 try {
                     response = closure.apply(null, params);
+                    if (!(response instanceof Response)) {
+                        response = request.respondWith(response, {status: 200});
+                    }
                 } catch (e) {
                     response = request.respondWith(e, {status: 500});
                 }
@@ -128,6 +136,10 @@ class VueResourceMocker {
         }
         var matches = path.match(route);
         return matches.slice(1);
+    }
+
+    getResponseClass() {
+        return Response;
     }
 };
 
