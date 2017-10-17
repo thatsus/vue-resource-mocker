@@ -1,4 +1,5 @@
 
+import qs from 'qs';
 import url from 'url';
 import Vue from 'vue';
 
@@ -32,8 +33,9 @@ class VueResourceMocker {
                 next(request.respondWith('File Not Found', {status: 404}));
             } else {
                 let response;
-                let pathname = url.parse(request.getUrl(), true, true).pathname;
-                let params = this.getParams(route.route, pathname)
+                let requestUrl = url.parse(request.getUrl(), true, true);
+                request.query = qs.parse(requestUrl.search, {ignoreQueryPrefix: true});
+                let params = this.getParams(route.route, requestUrl.pathname)
                     .map(decodeURIComponent);
                 params.unshift(request);
                 let closure = route.use

@@ -9,6 +9,7 @@ elixir.ready(function () {
       libraryTarget: 'commonjs2',
     },
     externals: {
+        'qs': 'qs',
         'url': 'url',
         'vue': 'vue',
         'vue-resource': 'vue-resource'

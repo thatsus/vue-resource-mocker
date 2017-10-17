@@ -62,33 +62,44 @@ module.exports =
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 2);
+/******/ 	return __webpack_require__(__webpack_require__.s = 3);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
 /***/ function(module, exports) {
 
-module.exports = require("url");
+module.exports = require("qs");
 
 /***/ },
 /* 1 */
 /***/ function(module, exports) {
 
-module.exports = require("vue");
+module.exports = require("url");
 
 /***/ },
 /* 2 */
+/***/ function(module, exports) {
+
+module.exports = require("vue");
+
+/***/ },
+/* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_url__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_url___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_url__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_vue__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_vue__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_qs__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_qs___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_qs__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_url__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_url___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_url__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_vue__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_vue__);
 
 
 
+
+
+var Response = null;
 
 /**
  * Vue plugin that intercepts vue-resource calls so that custom responses can 
@@ -110,18 +121,25 @@ VueResourceMocker.prototype.install = function install (Vue) {
     }
     Vue.http.interceptors.length = 0;
     Vue.http.interceptors.push(function (request, next) {
+        if (!Response) {
+            Response = request.respondWith(null).constructor;
+        }
         var route = this$1.findRoute(request);
         if (!route) {
             next(request.respondWith('File Not Found', {status: 404}));
         } else {
             var response;
-            var pathname = __WEBPACK_IMPORTED_MODULE_0_url___default.a.parse(request.getUrl(), true, true).pathname;
-            var params = this$1.getParams(route.route, pathname)
+            var requestUrl = __WEBPACK_IMPORTED_MODULE_1_url___default.a.parse(request.getUrl(), true, true);
+            request.query = __WEBPACK_IMPORTED_MODULE_0_qs___default.a.parse(requestUrl.search, {ignoreQueryPrefix: true});
+            var params = this$1.getParams(route.route, requestUrl.pathname)
                 .map(decodeURIComponent);
             params.unshift(request);
             var closure = route.use
             try {
                 response = closure.apply(null, params);
+                if (!(response instanceof Response)) {
+                    response = request.respondWith(response, {status: 200});
+                }
             } catch (e) {
                 response = request.respondWith(e, {status: 500});
             }
@@ -185,7 +203,7 @@ VueResourceMocker.prototype.findRoute = function findRoute (request) {
     if (!byMethod) {
         return null;
     }
-    var pathname = __WEBPACK_IMPORTED_MODULE_0_url___default.a.parse(request.getUrl(), true, true).pathname;
+    var pathname = __WEBPACK_IMPORTED_MODULE_1_url___default.a.parse(request.getUrl(), true, true).pathname;
     var match = byMethod.filter(function (route) {
         if (route.route && route.route.test && route.route.test(pathname)) {
             return true;
@@ -220,6 +238,10 @@ VueResourceMocker.prototype.getParams = function getParams (route, path) {
     }
     var matches = path.match(route);
     return matches.slice(1);
+};
+
+VueResourceMocker.prototype.getResponseClass = function getResponseClass () {
+    return Response;
 };;
 
 module.exports = VueResourceMocker;
